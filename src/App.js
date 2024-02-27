@@ -1,24 +1,18 @@
-import logo from './logo.svg';
+import AudioList from './components/AudioList';
 import './App.css';
-
+import { MusicProvider } from './components/MusicContext';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MusicProvider>
+      <div>
+        <header>
+          <div className='text-4xl my-4 text-center'>Audio Running Tool</div>
+          <div className='flex flex-row'>
+            <AudioList />
+          </div>
+        </header>
+      </div>
+    </MusicProvider>
   );
 }
 
