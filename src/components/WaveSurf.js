@@ -1,40 +1,65 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useQueue } from './QueueContext.js';
 import WaveSurfer from 'wavesurfer.js';
 
-const Waveform = ({ audioUrl }) => {
+const Waveform = () => {
+    const [isPlay, setIsPlay] = useState(false);
+    const [wavesurfer, setWaveSurfer] = useState(null);
     const waveformRef = useRef(null);
-    var wavesurfer;
+    const { queue, setQueue } = useQueue();
 
     useEffect(() => {
-        // Initialize WaveSurfer
-        wavesurfer = WaveSurfer.create({
+        if (queue.length === 0) return;
+        const ws = WaveSurfer.create({
             container: waveformRef.current,
             waveColor: 'violet',
             progressColor: 'purple',
-            url: audioUrl
+            url: queue[0].src
         });
-        console.log(wavesurfer)
+
+        ws.on('ready', () => {
+            setWaveSurfer(ws);
+            setIsPlay(true);
+            ws.play();
+        });
+
+        ws.on('finish', handleTrackFinish);
 
         return () => {
-            wavesurfer.destroy();
+            if (ws) {
+                ws.destroy();
+            }
         };
-    }, [audioUrl]);
+    }, [queue[0]]);
+
+    const handleTrackFinish = () => {
+        setQueue(prevQueue => prevQueue.slice(1));
+    };
+
     const handlePlayPause = () => {
-        if (wavesurfer.isPlaying()) {
-            wavesurfer.pause();
-        } else {
-            wavesurfer.play();
+        if (wavesurfer) {
+            if (isPlay) {
+                wavesurfer.pause();
+                setIsPlay(false);
+            } else {
+                wavesurfer.play();
+                setIsPlay(true);
+            }
         }
     };
     return (
-        <div>
-            <div className='text-2xl my-2'>Audio Waveform : </div>
-            <div className='h-32 w-96 bg-yellow-100 overflow-visible' ref={waveformRef}></div>
+        <div className='max-[1024px]:mx-3 mx-2 max-sm:w-9/12'>
+            <div className='text-2xl my-2 max-[1024px]:my-0'>Audio Waveform : </div>
+            <div className='h-32 w-72 bg-yellow-100 overflow-visible' ref={waveformRef}></div>
             <div className="flex flex-col">
-                <button className='hover:cursor-pointer bg-yellow-300 my-2 h-20 border border-gray-500' onClick={handlePlayPause}>Play/Pause</button>
+                {(wavesurfer && queue[0]) && (
+                    <button className='hover:cursor-pointer bg-yellow-300 my-2 h-20 border border-gray-500' onClick={handlePlayPause}>
+                        {isPlay ? 'Pause' : 'Play'}
+                    </button>
+                )}
             </div>
         </div>
-    )
+    );
 };
 
 export default Waveform;

@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import AudioListItem from './AudioListItem'
 import Waveform from './WaveSurf';
-import { useMusic } from './MusicContext.js';
 
 const audioList = [
     { name: "better-day", src: "/assets/better-day.mp3" },
@@ -12,11 +11,10 @@ const audioList = [
 ]
 
 const AudioList = () => {
-    const { currentMusic, setCurrentMusic } = useMusic();
     return (
         <>
-            <div className='p-8 w-4/12'>
-                <div className='ml-4 text-2xl flex justify-self-center'>Audio List</div>
+            <div className='p-8 w-4/12 max-[1024px]:w-3/12 max-sm:w-full'>
+                <div className='ml-4 text-2xl'>Audio List</div>
                 {audioList.map((audio, index) => (
 
                     <AudioListItem
@@ -27,8 +25,7 @@ const AudioList = () => {
                 ))}
             </div>
             {
-                <Waveform audioUrl=
-                    {currentMusic}
+                <Waveform
                 />
             }
         </>
